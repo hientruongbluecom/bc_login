@@ -1,8 +1,0 @@
-<config>
-    <modules>
-        <Bc_Login>
-            <active>true</active>
-            <codePool>local</codePool>
-        </Bc_Login>
-    </modules>
-</config>
