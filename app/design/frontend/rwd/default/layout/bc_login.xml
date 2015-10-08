@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+    <default>
+        <reference name="head">
+            <action ifconfig="bcajaxlogin/settings/enabled" method="addCss"><stylesheet>bluecom/ajaxlogin/css/ajaxlogin.css</stylesheet></action>
+            <action ifconfig="bcajaxlogin/settings/jquery" method="addItem"><type>skin_js</type><script>bluecom/ajaxlogin/js/jquery-1-11-1.js</script></action>
+            <action ifconfig="bcajaxlogin/settings/jqueryui" method="addItem"><type>skin_js</type><script>bluecom/ajaxlogin/js/jquery-ui-1-10-4.js</script></action>
+            <action ifconfig="bcajaxlogin/settings/enabled" method="addItem"><type>skin_js</type><script>bluecom/ajaxlogin/js/ajaxlogin.js</script></action>
+        </reference>
+        <reference name="content">
+            <block ifconfig="bcajaxlogin/settings/enabled" type="bc_login/login" name="bcajaxlogin" as="bcajaxlogin">
+                <action ifconfig="bcajaxlogin/settings/enabled"
+                        method="setTemplate">
+                    <template>bluecom/ajaxlogin/ajaxlogin.phtml</template>
+                </action>
+            </block>
+        </reference>
+    </default>
+</layout>
