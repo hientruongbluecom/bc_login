@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+    <default>
+        <reference name="head">
+            <action ifconfig="bcajaxlogin/settings/enabled" method="addItem">
+                <type>skin_css</type>
+                <name>bluecom/ajaxlogin/css/ajaxlogin.css</name>
+                <params/>
+            </action>
+            <action ifconfig="bcajaxlogin/settings/enabled" method="addItem">
+                <type>skin_js</type>
+                <name>bluecom/ajaxlogin/js/ajaxlogin.js</name>
+            </action>
+        </reference>
+        <reference name="before_body_end">
+            <block type="core/template" name="ajaxlogin">
+                <action method="setTemplate" ifconfig="bcajaxlogin/settings/enabled"><template>bluecom/ajaxlogin/index.phtml</template></action>
+                <block type="customer/form_register" name="customer_form_register_ajax" template="bluecom/ajaxlogin/register.phtml">
+                    <block type="page/html_wrapper" name="customer.form.register.fields.before" as="form_fields_before" translate="label">
+                        <label>Form Fields Before</label>
+                    </block>
+                </block>
+                <block type="persistent/form_remember" name="persistent.remember.me" template="persistent/remember_me.phtml" />
+                <block type="core/template" name="persistent.remember.me.tooltip" template="persistent/remember_me_tooltip.phtml" />
+            </block>
+        </reference>
+    </default>
+</layout>

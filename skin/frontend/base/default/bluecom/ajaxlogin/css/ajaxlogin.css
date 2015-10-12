@@ -1,245 +1,44 @@
-.header { text-align: left!important; }
-#header-account { position:relative;}
-
-.bc-window-outside { position:relative; }
-.bc-window-outside .close { cursor:pointer; text-align:center; width: 40px;
-    float:right; display: block; color: #636363; text-decoration:none;
-    font-weight:normal; font-size:30px; position:absolute;  top:-13px;
-    right:-10px;
-}
-.bc-ajaxlogin-loader {
-    display:none; position:absolute; top:50%; left:50%; margin-left:-20px;
-    margin-top:-15px; height:31px; width:40px; z-index:9999;
-    background: url('../images/loader.gif') no-repeat center center;
-}
-.bc-window-title h3 { display:inline; margin:0; color:#3399cc; }
-.bc-switch-window {
-    cursor:pointer; color:#3399cc; line-height:33px;
-}
-.bc-window-box { margin-top:15px; }
-.bc-window-subtitle p {
-    margin:20px 0 5px 0; width:100%; font-size:14px; font-weight:bold; color:#888;
-    border-bottom:1px solid #3399cc;
-}
-.bc-window-box .valid-input { padding:5px 0; width:100% }
-.bc-window-box .valid-input label { font-size:14px; line-height:26px; }
-.bc-window-box .valid-input input[type="text"],
-.bc-window-box .valid-input input[type="password"] {
-    font-size:15px; padding:3px; height:40px;
-}
-.bc-ajaxlogin-error { color:#eb340a; }
-.err-licence {  }
-.err-newsletter {  }
-.bc-window-box label a { display:inline !important; padding:0 !important; }
-.bc-window-box .valid-input-checkbox input { margin:7px 7px 0 0; }
-.bc-window-box .valid-input-checkbox label { font-size:12px; width:auto; }
-.bc-window-box .valid-input .bc-ajaxlogin-error { }
-.bc-window-box .valid-input-checkbox .bc-ajaxlogin-error { text-align:left; }
-.bc-window-box .box-contents {  }
-.bc-window-box .box-contents-button { width:100%; margin-top:20px; }
-.bc-window-box .box-contents-button button { }
-.bc-window-box .bc-forgot-password { margin-top:10px; }
-
-
-#dullDiv {
-    background: none repeat scroll 0 0 #000000;
-    border: 0.0625em solid #114EAB;
-    height: 100%;
-    left: 0;
-    opacity: 0.9;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 9999;
-    display: none;
+/* window */
+.ajaxlogin-window { border: 1px solid rgba(0, 0, 0, 0.3); background:#fff; z-index:999; padding: 10px; position:absolute; text-align:left;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    outline: none;
+    -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+    background-clip: padding-box;
 }
 
-/* ============================================ *
- * Header - Account
- * ============================================ */
-/* -------------------------------------------- *
- * Skip Link - Account
- */
-.skip-account:not(.skip-active):hover .icon {
-  background-position: -46px -44px;
+.ajaxlogin-window .page-title,
+.ajaxlogin-window .page-title span { color:#0A263C; font-size:18px; font-weight: normal; text-align: center}
+.ajaxlogin-window .content { padding:7px; overflow:auto; overflow-x:hidden; }
+.ajaxlogin-window label { width:auto; text-align:left; margin-bottom: 0; }
+.ajaxlogin-window label em { display:none }
+.ajaxlogin-window ul li { line-height: normal; }
+.ajaxlogin-window ul,
+.ajaxlogin-window .form-list { list-style: none; margin: 0; }
+.ajaxlogin-window .form-list li { margin-bottom: 10px }
+.ajaxlogin-window .form-list .input-box { clear:both; }
+.ajaxlogin-window .form-list input.input-text,
+.ajaxlogin-window .form-list textarea { width:100% }
+.ajaxlogin-window .input-box input { margin: 0
 }
-.skip-account .icon {
-  background-position: 4px -44px;
-}
-
-
-  .skip-account {
-    float: none;
-    width: auto;
-    vertical-align: top;
-    display: inline-block;
-    padding: 0 10px;
-    text-transform: uppercase;
-  }
-
-  #header-account.skip-active {
-    background: #FBFBFB;
-    border: solid 1px #cccccc;
-    display: block;
-    position: absolute;
-    z-index: 200;
-    top: 40px;
-    right: 115px;
-    width: 200px;
-    z-index: 9999;top: 40%;right: 33%; 
-  }
-
-  #header-account a {
-    display: block;
-    padding: 5px 10px;
-    color: #636363;
-    line-height: 2;
-  }
-
-  #header-account a:hover {
-    color: #3399cc;
-  }
-
-/* -------------------------------------------- *
- * Account Links
- */
-#header-account {
-  padding: 5px 0;
-}
-
-#header-account a {
-  position: relative;
-  display: block;
-  padding: 5px 10px;
-  line-height: 23px;
-  text-align: center;
-}
-
-#header-account a:hover {
-  color: #3399cc;
-}
-/* ============================================ *
- * Skip Content
- * ============================================ */
-.skip-content {
-  display: none;
-}
-
-.skip-content.skip-active {
-  display: block;
-  background: #EDEDED;
-}
-   
-
-
-/******** Responsive Ajax & Register login Using Light box *****************/
-    
-@media only screen and (max-width: 1280px) {
-    
-.bc-register-window .bc-window-box .valid-input {  
-    padding: 1px 0px !important;
-}
-
-
-.bc-window-box .valid-input input[type="text"], .bc-window-box .valid-input input[type="password"] {
-    width: 225px!important;
-}
-
-}
-
-
-@media only screen and (max-width: 1024px) {
-    
-   #header-account{
-      
-       width: 35%!important;
-       
-   } 
-  .bc-login-window { display:none;} 
-   
-}
-
-@media only screen and (min-width : 533px) and (max-width : 853px) {
-    .bc-register-window,
-    .bc-login-window {
-       width:284px!important; 
-    }
-    .recaptchatable .recaptcha_image_cell center img {width:240px;}
-    .bc-register-window #recaptcha_image{width: 252px!important;}
-    .bc-register-window #recaptcha_table {
-    width: 254px !important;
-    }
-    
-}
-
-
-/* Desktop or TV **************************************************************/
-@media only screen and (min-width: 771px) {
-    #header-account {
-        width:350px !important;
-    }
-    .bc-register-window,
-    .bc-login-window { display:none; width:350px; z-index:9998; padding:0; }
-    .bc-window-outside { margin:20px; }
-    .bc-window-box .valid-input input[type="text"],
-    .bc-window-box .valid-input input[type="password"] {
-        width:306px;
-    }
-    .bc-forgot-password a { text-align:right !important; }
-    .bc-switch-window { text-align:center; padding:5px; display:inline; }
-}
-/******************************************************************************/
-
-/* Tablet *********************************************************************/
-@media only screen and (max-width: 771px) {
-   
-    .bc-register-window { display:none;width:400px; padding:10px 30px;} 
-    .bc-login-window {
-        width:400px; padding:10px 30px;
-    }
-    .bc-forgot-password a { text-align:right !important; }
-    .bc-switch-window { text-align:center; padding:5px; display:inline; }
-}
-@media only screen and (max-width: 670px) {
-    
-    .bc-register-window,
-    .bc-login-window {
-        width:400px; padding:10px 30px;
-    }
-    .bc-switch-window { text-align:center; display:block; padding:0; }
-    .bc-forgot-password a { text-align:center !important; }
-}
-/******************************************************************************/
-@media only screen and (min-width : 533px) and (max-width : 853px) {
-    .bc-register-window,
-    .bc-login-window {
-        width:284px!important; 
-    }
-}
-/* Mobile *********************************************************************/
-@media only screen and (max-width: 480px) {
-    #header-account{
-       top:10%!important;
-       left: 24%;
-       width: 35%!important;
-       position: fixed;
-   } 
-    .bc-register-window,
-    .bc-login-window {
-        width:auto; padding:15px;
-    }
-   
-    
-    #termsckb-wrap {display:none;}
-    
-    .bc-switch-window { text-align:center; display:block; padding:0; }
-    .bc-window-box .valid-input input[type="text"],
-    .bc-window-box .valid-input input[type="password"] {
-        width:100%;
-    }
-    .bc-login-window .bc-socialconnect-login-upper{display:none;}
-    .bc-login-window .bc-ajaxlogin-error{font-size: 11px;line-height: 8.5px;}
-
-}
-/******************************************************************************/
-
+.ajaxlogin-window .input-box .validation-advice { line-height: normal; }
+.ajaxlogin-window .close { position:absolute; top:4px; right:4px; width:32px; height:32px; background:url(../images/close.png) no-repeat 50% 50%; }
+.ajaxlogin-window .close:hover {}
+.ajaxlogin-window .progress-indicator { display: block; text-align: center; float:right}
+.ajaxlogin-window .please-wait { position:static; padding:0; background:none; border:none; margin:0; left:auto; top:auto; }
+.ajaxlogin-window .buttons-set { margin:0; text-align:center; border-top:0 solid #e4e4e4; padding:7px; }
+.ajaxlogin-window .buttons-set a { display: block; }
+.ajaxlogin-window .form-list .input-box{ width:auto }
+.ajaxlogin-window .buttons-set .back-link { display: block; margin: 0; padding: 0; text-align: center; }
+.ajaxlogin-window .buttons-set .back-link a {  }
+.ajaxlogin-window .buttons-set .please-wait
+.ajaxlogin-window .actionbar { padding:10px 10px 0; text-align:right; font-weight:bold; }
+.ajaxlogin-button{float: none !important;margin-top: 10px;}
+#ajaxlogin-mask { background: black; opacity:0.4; -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)"; filter:alpha(opacity=40);
+    position:absolute; top:0; left:0; width:100%; height:100%; z-index:990; }
+* html #ajaxlogin-mask { position:absolute; }

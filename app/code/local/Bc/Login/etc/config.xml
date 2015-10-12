@@ -5,21 +5,11 @@
         </Bc_Login>
     </modules>
     <global>
-        <models>
-            <bc_login>
-                <class>Bc_Login_Model</class>
-            </bc_login>
-        </models>
         <helpers>
             <bc_login>
                 <class>Bc_Login_Helper</class>
             </bc_login>
         </helpers>
-        <blocks>
-            <bc_login>
-                <class>Bc_Login_Block</class>
-            </bc_login>
-        </blocks>
     </global>
     <frontend>
         <layout>
@@ -37,13 +27,6 @@
                     <frontName>login</frontName>
                 </args>
             </bc_login>
-            <customer>
-                <args>
-                    <modules>
-                        <bc_login before="Mage_Customer">Bc_Login</bc_login>
-                    </modules>
-                </args>
-            </customer>
         </routers>
     </frontend>
     <adminhtml>
@@ -72,9 +55,6 @@
         <bcajaxlogin>
             <settings>
                 <enabled>1</enabled>
-                <jquery>0</jquery>
-                <jqueryui>1</jqueryui>
-                <redirection>1</redirection>
             </settings>
         </bcajaxlogin>
     </default>
