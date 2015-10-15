@@ -1,48 +1,125 @@
-AjaxLogin = Class.create();
-AjaxLogin.prototype = {
-    initialize: function(config) {
-        this.config = Object.extend({
-            triggers: null,
+;
+var BC = BC || {};
+BC.Login = {
+    window : '',
+    close:'',
+    content:'',
+    config:null,
+    init:function(config){
+        BC.Login.config = jQuery.extend({
+            triggers: config,
             markup:
-            '<div class="d-shadow-wrap">'
-            +   '<div class="content"></div>'
-            +   '<div class="d-sh-cn d-sh-tl"></div><div class="d-sh-cn d-sh-tr"></div>'
-            + '</div>'
-            + '<div class="d-sh-cn d-sh-bl"></div><div class="d-sh-cn d-sh-br"></div>'
-            + '<a href="javascript:void(0)" class="close"></a>'
-        }, config || {});
-        this.config.size = Object.extend({
+                '<div class="d-shadow-wrap">'
+                    +   '<div class="content"></div>'
+                    +   '<div class="d-sh-cn d-sh-tl"></div><div class="d-sh-cn d-sh-tr"></div>'
+                    + '</div>'
+                    + '<div class="d-sh-cn d-sh-bl"></div><div class="d-sh-cn d-sh-br"></div>'
+                    + '<a href="javascript:void(0)" class="close"></a>'
+        },config||{});
+        BC.Login.config.size = jQuery.extend(true,{
             width    : 'auto',
             height   : 'auto',
             maxWidth : 550,
             maxHeight: 600
-        }, this.config.size || {});
-
+        },BC.Login.config.size || {});
         this._prepareMarkup();
         this._attachEventListeners();
         this._addEventListeners();
     },
+    update: function(content, size) {
+        var oldContent = jQuery(BC.Login.content).children();
+        oldContent && jQuery('body').append(oldContent.hide());
 
+        jQuery(BC.Login.content).html(content);
+        content.show();
+        BC.Login.updateSize(size);
+        BC.Login.center();
+        return this;
+    },
+    updateSize: function(sizeConfig) {
+        sizeConfig = sizeConfig || BC.Login.config.size;
+        // reset previous size
+        jQuery(BC.Login.window).css({
+            width : 'auto',
+            height: 'auto',
+            left  : 0, /* thin content box fix while page is scrolled to the right */
+            top   : 0
+        });
+        jQuery(BC.Login.content).css({
+            width : isNaN(sizeConfig.width)  ? sizeConfig.width  : sizeConfig.width + 'px',
+            height: isNaN(sizeConfig.height) ? sizeConfig.height : sizeConfig.height + 'px'
+        });
+
+        jQuery(BC.Login.window).css({
+            visibility: 'hidden'
+        }).show();
+
+        var width        = jQuery(BC.Login.content).width() + 100, /* right shadow and borders */
+            viewportWidth = jQuery(document).width(),
+            viewportHeight = jQuery(document).height();
+
+        sizeConfig = jQuery.extend(BC.Login.config.size, sizeConfig || {});
+        if ('auto' === sizeConfig.width
+            && (width > sizeConfig.maxWidth || width > viewportWidth)) {
+
+            if (width > viewportWidth && viewportWidth < (sizeConfig.maxWidth + 100)) {
+                width = viewportWidth - 100; /* right shadow and borders */
+            } else {
+                width = sizeConfig.maxWidth;
+            }
+            jQuery(BC.Login.content).css({
+                width: width + 'px'
+            });
+        }
+
+        var height          = jQuery(BC.Login.content).height() + 20 /* top button */;
+        if ('auto' === sizeConfig.height
+            && (height > sizeConfig.maxHeight || height > viewportHeight)) {
+
+            if (height > viewportHeight && viewportHeight < (sizeConfig.maxHeight + 20)) {
+                height = viewportHeight - 60; /* bottom shadow */
+            } else {
+                height = sizeConfig.maxHeight;
+            }
+            jQuery(BC.Login.content).css({
+                height: height + 'px'
+            });
+        }
+
+        // update window size. Fix for all IE browsers
+        var paddingHorizontal = parseInt(jQuery(BC.Login.content).css('padding-left')) + parseInt(jQuery(BC.Login.content).css('padding-right'));
+        jQuery(BC.Login.window).hide();
+        jQuery(BC.Login.window).css({
+                width     : width + paddingHorizontal + 'px',
+                visibility: 'visible'
+            });
+
+        return this;
+    },
     show: function() {
         if (!this.centered) {
             this.center();
         }
-        $$('select').invoke('addClassName', 'ajaxlogin-hidden');
+        if(jQuery("#header-account").hasClass("skip-active")){
+            jQuery("#header-account").removeClass("skip-active");
+        }
+        if(jQuery('body').find('.messages')){
+            jQuery('body').find('.messages').remove();
+        }
+        jQuery('.select').addClass('ajaxlogin-hidden');
 
-        if (!$('ajaxlogin-mask')) {
-            var mask = new Element('div');
-            mask.writeAttribute('id', 'ajaxlogin-mask');
-            var body    = document.body,
-                element = document.documentElement,
+        if (!jQuery('#ajaxlogin-mask') ){
+            var mask = jQuery("<div></div>").attr('id','ajaxlogin-mask');
+            var body    = jQuery('body'),
+                element = jQuery('html'),
                 height  = Math.max(
-                    Math.max(body.scrollHeight, element.scrollHeight),
-                    Math.max(body.offsetHeight, element.offsetHeight),
-                    Math.max(body.clientHeight, element.clientHeight)
+                    Math.max(body.outerHeight(), element.outerHeight()),
+                    Math.max(body.height(), element.height())
                 );
-            mask.setStyle({
+            jQuery(mask).css({
                 height: height + 'px'
             });
-            $(document.body).insert(mask);
+            jQuery('body').append(mask);
         }
 
         if (!window.ajaxloginMaskCounter) {
@@ -55,38 +132,227 @@ AjaxLogin.prototype = {
 
         // set highest z-index
         var zIndex = 999;
-        $$('.ajaxlogin-window').each(function(el) {
-            maxIndex = parseInt(el.getStyle('zIndex'));
+        jQuery('.ajaxlogin-window').each(function(i) {
+            maxIndex = parseInt(jQuery(this).css('zIndex'));
             if (zIndex < maxIndex) {
                 zIndex = maxIndex;
             }
         });
-        this.window.setStyle({
-            'zIndex': zIndex + 1
+        jQuery(BC.Login.window).css({
+            zIndex: zIndex + 1
         });
 
-        this._onKeyPressBind = this._onKeyPress.bind(this);
-        document.observe('keyup', this._onKeyPressBind);
-        this.window.show();
-    },
 
+        jQuery(BC.Login.window).show();
+    },
+    _prepareMarkup: function() {
+        BC.Login.window = jQuery('<div></div>').addClass("ajaxlogin-window")[0];
+        jQuery(BC.Login.window).append(BC.Login.config.markup).hide();
+        BC.Login.content = jQuery(BC.Login.window).find('.content')[0];
+        BC.Login.close   = jQuery(BC.Login.window).find('.close')[0];
+        jQuery('body').append(BC.Login.window);
+    },
+    _attachEventListeners: function(){
+        jQuery(BC.Login.close).bind('click',function (){
+            BC.Login.hide();
+        });
+        if (BC.Login.config.triggers) {
+            for (var i in BC.Login.config.triggers) {
+                var trigger = BC.Login.config.triggers[i];
+                if (typeof trigger === 'function') {
+                    continue;
+                }
+                trigger.size = trigger.size || {};
+                for (var j in BC.Login.config.size) {
+                    if (trigger.size[j]) {
+                        continue;
+                    }
+                    trigger.size[j] = BC.Login.config.size[j];
+                }
+                trigger.el.each(function(index){
+                    var t = trigger;
+                    jQuery(this).bind(t.event,function(e) {
+                        if (typeof e != 'undefined') { // ie9 fix
+                            e.preventDefault ? e.preventDefault() : e.returnValue = false;
+                        }
+                        e.stopPropagation();
+                        if (!t.window) {
+                            return;
+                        }
+                        BC.Login.update(t.window[0], t.size).show();
+                    });
+                });
+            }
+        }
+    },
+    _addEventListeners: function() {
+        var self = this;
+
+        jQuery('#ajaxlogin-login-form') && jQuery('#ajaxlogin-login-form').bind('submit', function(e) {
+            if (typeof e != 'undefined') { // ie9 fix
+                e.preventDefault ? e.preventDefault() : e.returnValue = false;
+            }
+            e.stopPropagation();
+
+            if (!ajaxLoginForm.validator.validate()) {
+                return false;
+            }
+
+            jQuery('#login-please-wait').show();
+            jQuery('#send2').attr('disabled', 'disabled');
+            jQuery('#ajaxlogin-login-form .buttons-set')
+                .addClass('disabled')
+                .css('opacity','0.5');
+            jQuery.ajax({
+                type: 'POST',
+                url: jQuery('#ajaxlogin-login-form').attr("action"),
+                data: jQuery('#ajaxlogin-login-form').serialize(),
+                success: function(transport){
+                    jQuery('#ajaxlogin-login-window').find('.messages').remove();
+                    var response = jQuery.parseJSON(transport);
+                    if (response.error) {
+                        jQuery('<ul class="messages"></ul>').insertBefore('form#ajaxlogin-login-form');
+                        jQuery('.messages').append('<li class="error-msg"><ul>'+response.error+'</ul></li>');
+                    }
+                    if (response.redirect) {
+                        window.location.href = response.redirect;
+                        return;
+                    }
+                    jQuery('#login-please-wait').hide();
+                    jQuery('#send2').removeAttr('disabled');
+                    jQuery('#ajaxlogin-login-form .buttons-set')
+                        .removeClass('disabled')
+                        .css('opacity','1');
+                }
+
+            });
+
+        });
+
+        jQuery('#ajaxlogin-create-form') && jQuery('#ajaxlogin-create-form').bind('submit', function(e) {
+            if (typeof e != 'undefined') { // ie9 fix
+                e.preventDefault ? event.preventDefault() : e.returnValue = false;
+            }
+            e.stopPropagation();
+
+            if (!ajaxLoginForm.validator.validate()) {
+                return false;
+            }
+
+            jQuery('#create-please-wait').show();
+            jQuery('#create').attr('disabled', 'disabled');
+            jQuery('#ajaxlogin-create-form .buttons-set')
+                .addClass('disabled')
+                .css('opacity','0.5');
+            jQuery.ajax({
+                type:'POST',
+                url: jQuery('#ajaxlogin-create-form').attr("action"),
+                data:jQuery('#ajaxlogin-create-form').serialize(),
+                success: function (transport){
+                    jQuery('#ajaxlogin-create-window').find('.messages').remove();
+                    var response = jQuery.parseJSON(transport);
+                    if (response.error) {
+                        jQuery('<ul class="messages"></ul>').insertBefore('form#ajaxlogin-create-form');
+                        jQuery('.messages').append('<li class="error-msg"><ul>'+response.error+'</ul></li>');
+                    }
+                    if (response.redirect) {
+                        jQuery(document).location.href = response.redirect;
+                        return;
+                    }
+                    jQuery('#create-please-wait').hide();
+                    jQuery('#create').removeAttr('disabled');
+                    jQuery('#ajaxlogin-create-form .buttons-set')
+                        .removeClass('disabled')
+                        .css('opacity','1');
+                }
+            });
+        });
+
+        jQuery('#ajaxlogin-forgot-password-form') && jQuery('#ajaxlogin-forgot-password-form').bind('submit', function(e) {
+            if (typeof e != 'undefined') { // ie9 fix
+                e.preventDefault ? e.preventDefault() : e.returnValue = false;
+            }
+            e.stopPropagation();
+
+            if (!ajaxForgotForm.validator.validate()) {
+                return false;
+            }
+
+            jQuery('#forgot-please-wait').show();
+            jQuery('#btn-forgot').attr('disabled', 'disabled');
+            jQuery('#ajaxlogin-forgot-password-form .buttons-set')
+                .addClass('disabled')
+                .css('opacity','0.5');
+
+            jQuery.ajax({
+                type:'POST',
+                url: jQuery('#ajaxlogin-forgot-password-form').attr("action"),
+                data: jQuery('#ajaxlogin-forgot-password-form').serialize(),
+                success: function (transport){
+                    jQuery('#ajaxlogin-forgot-window').find('.messages').remove();
+                    var response = jQuery.parseJSON(transport);
+                    if (response.error) {
+                        jQuery('<ul class="messages"></ul>').insertBefore('form#ajaxlogin-forgot-password-form');
+                        jQuery('.messages').append('<li class="error-msg"><ul>'+response.error+'</ul></li>');
+                    }else if(response.message){
+                        jQuery('<ul class="messages"></ul>').insertBefore('form#ajaxlogin-forgot-password-form');
+                        jQuery('.messages').append('<li class="success-msg"><ul>'+response.message+'</ul></li>');
+                        BC.Login.activate('login');
+                    }
+
+                    jQuery('#forgot-please-wait').hide();
+                    jQuery('#btn-forgot').removeAttr('disabled');
+                    jQuery('#ajaxlogin-forgot-password-form .buttons-set')
+                        .removeClass('disabled')
+                        .css('opacity','1');
+                }
+            });
+        });
+
+        jQuery('#ajaxlogin-forgot-password-form').find('.ajaxlogin-login') && jQuery('#ajaxlogin-forgot-password-form').find('.ajaxlogin-login').bind('click', function(e) {
+            e.preventDefault();
+            BC.Login.activate('login');
+        });
+    },
+    center: function() {
+        var viewportSizeWidth   = jQuery(document).width(),
+            left, top;
+
+        if ('undefined' === typeof viewportSizeWidth) { // mobile fix. not sure is this check is good enough.
+            top  = '25%';
+            left = '25%';
+        } else {
+            if(viewportSizeWidth >= 768){
+                top = '25%';
+                left = '35%';
+            }else{
+                top = '25%';
+                left = '25%';
+            }
+
+        }
+
+        jQuery('.ajaxlogin-window').css({left:left, top:top});
+        this.centered = true;
+
+        return this;
+    },
     hide: function() {
-        if (this.modal || !this.window.visible()) {
+        if (this.modal || !jQuery(BC.Login.window).is(":visible")) {
             return;
         }
-
-        if (this._onKeyPressBind) {
-            document.stopObserving('keyup', this._onKeyPressBind);
+        if(jQuery('body').find('.messages')){
+            jQuery('body').find('.messages').remove();
         }
-        if (this.config.destroy) {
-            this.window.remove();
+        if (BC.Login.config.destroy) {
+            jQuery(BC.Login.window).remove();
         } else {
-            this.window.hide();
+            jQuery(BC.Login.window).hide();
         }
         this.maskCounted = 0;
         if (!--window.ajaxloginMaskCounter) {
-            $('ajaxlogin-mask') && $('ajaxlogin-mask').remove();
-            $$('select').invoke('removeClassName', 'ajaxlogin-hidden');
+            jQuery('#ajaxlogin-mask') && jQuery('#ajaxlogin-mask').remove();
+            jQuery('#select').removeClass('ajaxlogin-hidden');
         }
     },
 
@@ -94,536 +360,15 @@ AjaxLogin.prototype = {
         this.modal = flag;
 
         if (flag) {
-            this.window.select('.close').invoke('hide');
+            jQuery(BC.Login.window).find('.close')[0].hide();
         } else {
-            this.window.select('.close').invoke('show');
+            jQuery(BC.Login.window).find('.close')[0].show();
         }
         return this;
     },
-
-    update: function(content, size) {
-        var oldContent = this.content.down();
-        oldContent && $(document.body).insert(oldContent.hide());
-
-        this.content.update(content);
-        content.show();
-        this.addActionBar();
-        this.updateSize(size);
-        this.center();
-        return this;
-    },
-
-    addActionBar: function() {
-        this.removeActionBar();
-
-        var agreementId = this.content.down().id.replace('-window', ''),
-            trigger     = this.config.triggers[agreementId];
-
-        if (!trigger || !trigger.actionbar) {
-            return;
-        }
-
-        this.content.insert({
-            after: '<div class="actionbar">' + trigger.actionbar.html + '</div>'
-        });
-        $(trigger.actionbar.el).observe(
-            trigger.actionbar.event,
-            trigger.actionbar.callback.bindAsEventListener(this, agreementId.replace('ajaxlogin-', ''))
-        );
-    },
-
-    removeActionBar: function() {
-        var agreementId = this.content.down().id.replace('-window', ''),
-            trigger     = this.config.triggers[agreementId];
-
-        if (trigger && trigger.actionbar) {
-            var actionbar = $(trigger.actionbar.el);
-            if (actionbar) {
-                actionbar.stopObserving(trigger.actionbar.event);
-            }
-        }
-
-        this.window.select('.actionbar').invoke('remove');
-    },
-
-    getActionBar: function() {
-        return this.window.down('.actionbar');
-    },
-
-    center: function() {
-        var viewportSize   = document.viewport.getDimensions(),
-            viewportOffset = document.viewport.getScrollOffsets(),
-            shadowWrap     = this.window.down('.d-shadow-wrap'),
-            windowSize     = this.window.getDimensions(),
-            left, top;
-
-        if ('undefined' === typeof viewportSize.width) { // mobile fix. not sure is this check is good enough.
-            top  = viewportOffset.top + 20;
-            left = viewportOffset.left;
-        } else {
-            top = viewportSize.height / 2
-            - windowSize.height / 2
-            + viewportOffset.top
-            + parseInt(shadowWrap.getStyle('margin-top'))
-            + parseInt(shadowWrap.getStyle('padding-top')),
-                left = viewportSize.width / 2
-                - windowSize.width / 2
-                + viewportOffset.left
-                + parseInt(shadowWrap.getStyle('margin-left'))
-                + parseInt(shadowWrap.getStyle('padding-left'));
-
-            if (left < viewportOffset.left || windowSize.width > viewportSize.width) {
-                left = viewportOffset.left;
-            } else {
-                left -= 20; /* right shadow */
-            }
-            top = (top < viewportOffset.top  ? (20 + viewportOffset.top) : top)
-        }
-
-        this.setPosition(left, top);
-        this.centered = true;
-
-        return this;
-    },
-
-    setPosition: function(x, y) {
-        this.window.setStyle({
-            left: x + 17 /* left border */ + 'px',
-            top : y + 'px'
-        });
-
-        return this;
-    },
-
     activate: function(trigger) {
-        var trigger = this.config.triggers[trigger];
-        this.update(trigger.window.show(), trigger.size).show();
-    },
-
-    updateSize: function(sizeConfig) {
-        sizeConfig = sizeConfig || this.config.size;
-        // reset previous size
-        this.window.setStyle({
-            width : 'auto',
-            height: 'auto',
-            left  : 0, /* thin content box fix while page is scrolled to the right */
-            top   : 0
-        });
-        this.content.setStyle({
-            width : isNaN(sizeConfig.width)  ? sizeConfig.width  : sizeConfig.width + 'px',
-            height: isNaN(sizeConfig.height) ? sizeConfig.height : sizeConfig.height + 'px'
-        });
-
-        this.window.setStyle({
-            visibility: 'hidden'
-        }).show();
-
-        var width        = this.content.getWidth() + 100, /* right shadow and borders */
-            viewportSize = document.viewport.getDimensions();
-
-        sizeConfig = Object.extend(this.config.size, sizeConfig || {});
-        if ('auto' === sizeConfig.width
-            && (width > sizeConfig.maxWidth || width > viewportSize.width)) {
-
-            if (width > viewportSize.width && viewportSize.width < (sizeConfig.maxWidth + 100)) {
-                width = viewportSize.width - 100; /* right shadow and borders */
-            } else {
-                width = sizeConfig.maxWidth;
-            }
-            this.content.setStyle({
-                width: width + 'px'
-            });
-        }
-
-        var actionbar       = this.getActionBar(),
-            actionbarHeight = actionbar ? actionbar.getHeight() : 0,
-            height          = this.content.getHeight() + actionbarHeight + 20 /* top button */;
-        if ('auto' === sizeConfig.height
-            && (height > sizeConfig.maxHeight || height > viewportSize.height)) {
-
-            if (height > viewportSize.height && viewportSize.height < (sizeConfig.maxHeight + actionbarHeight + 20)) {
-                height = viewportSize.height - 60; /* bottom shadow */
-            } else {
-                height = sizeConfig.maxHeight;
-            }
-            height -= actionbarHeight;
-            this.content.setStyle({
-                height: height + 'px'
-            });
-        }
-
-        // update window size. Fix for all IE browsers
-        var paddingHorizontal = parseInt(this.content.getStyle('padding-left')) + parseInt(this.content.getStyle('padding-right'));
-        //var paddingVertical   = parseInt(this.content.getStyle('padding-top')) + parseInt(this.content.getStyle('padding-bottom'));
-        this.window.hide()
-            .setStyle({
-                width     : width + paddingHorizontal + 'px',
-//                height    : height + paddingVertical + 'px',
-                visibility: 'visible'
-            });
-
-        return this;
-    },
-
-    _prepareMarkup: function() {
-        this.window = new Element('div');
-        this.window.addClassName('ajaxlogin-window');
-        this.window.update(this.config.markup).hide();
-        this.content = this.window.select('.content')[0];
-        this.close   = this.window.select('.close')[0];
-        $(document.body).insert(this.window);
-    },
-
-    _attachEventListeners: function() {
-        // close window
-        this.close.observe('click', this.hide.bind(this));
-        // show window
-        if (this.config.triggers) {
-            for (var i in this.config.triggers) {
-                var trigger = this.config.triggers[i];
-                if (typeof trigger === 'function') {
-                    continue;
-                }
-                trigger.size = trigger.size || {};
-                for (var j in this.config.size) {
-                    if (trigger.size[j]) {
-                        continue;
-                    }
-                    trigger.size[j] = this.config.size[j];
-                }
-
-                trigger.el.each(function(el) {
-                    var t = trigger;
-                    el.observe(t.event, function(e) {
-                        if (typeof event != 'undefined') { // ie9 fix
-                            event.preventDefault ? event.preventDefault() : event.returnValue = false;
-                        }
-                        Event.stop(e);
-                        if (!t.window) {
-                            return;
-                        }
-                        this.update(t.window, t.size).show();
-                    }.bind(this));
-                }.bind(this));
-            }
-        }
-    },
-
-    _addEventListeners: function() {
-        var self = this;
-
-        $('ajaxlogin-login-form') && $('ajaxlogin-login-form').observe('submit', function(e) {
-            if (typeof event != 'undefined') { // ie9 fix
-                event.preventDefault ? event.preventDefault() : event.returnValue = false;
-            }
-            Event.stop(e);
-
-            if (!ajaxLoginForm.validator.validate()) {
-                return false;
-            }
-
-            $('login-please-wait').show();
-            $('send2').setAttribute('disabled', 'disabled');
-            $$('#ajaxlogin-login-form .buttons-set')[0]
-                .addClassName('disabled')
-                .setOpacity(0.5);
-
-            new Ajax.Request($('ajaxlogin-login-form').action, {
-                parameters: $('ajaxlogin-login-form').serialize(),
-                onSuccess: function(transport) {
-                    var section = $('ajaxlogin-login-form');
-                    if (!section) {
-                        return;
-                    }
-                    var ul = section.select('.messages')[0];
-                    if (ul) {
-                        ul.remove();
-                    }
-
-                    var response = transport.responseText.evalJSON();
-                    if (response.error) {
-                        var section = $('ajaxlogin-login-form');
-                        if (!section) {
-                            return;
-                        }
-                        var ul = section.select('.messages')[0];
-                        if (!ul) {
-                            section.insert({
-                                top: '<ul class="messages"></ul>'
-                            });
-                            ul = section.select('.messages')[0]
-                        }
-                        var li = $(ul).select('.error-msg')[0];
-                        if (!li) {
-                            $(ul).insert({
-                                top: '<li class="error-msg"><ul></ul></li>'
-                            });
-                            li = $(ul).select('.error-msg')[0];
-                        }
-                        $(li).select('ul')[0].insert(
-                            '<li>' + response.error + '</li>'
-                        );
-                        self.updateCaptcha('user_login');
-                    }
-                    if (response.redirect) {
-                        document.location = response.redirect;
-                        return;
-                    }
-                    $('login-please-wait').hide();
-                    $('send2').removeAttribute('disabled');
-                    $$('#ajaxlogin-login-form .buttons-set')[0]
-                        .removeClassName('disabled')
-                        .setOpacity(1);
-                }
-            });
-        });
-
-        $('ajaxlogin-create-form') && $('ajaxlogin-create-form').observe('submit', function(e) {
-            if (typeof event != 'undefined') { // ie9 fix
-                event.preventDefault ? event.preventDefault() : event.returnValue = false;
-            }
-            Event.stop(e);
-
-            if (!ajaxLoginForm.validator.validate()) {
-                return false;
-            }
-
-            $('create-please-wait').show();
-            $('create').setAttribute('disabled', 'disabled');
-            $$('#ajaxlogin-create-form .buttons-set')[0]
-                .addClassName('disabled')
-                .setOpacity(0.5);
-
-            new Ajax.Request($('ajaxlogin-create-form').action, {
-                parameters: $('ajaxlogin-create-form').serialize(),
-                onSuccess: function(transport) {
-                    var section = $('ajaxlogin-create-form');
-                    if (!section) {
-                        return;
-                    }
-                    var ul = section.select('.messages')[0];
-                    if (ul) {
-                        ul.remove();
-                    }
-
-                    var response = transport.responseText.evalJSON();
-                    if (response.error) {
-                        var section = $('ajaxlogin-create-form');
-                        if (!section) {
-                            return;
-                        }
-                        var ul = section.select('.messages')[0];
-                        if (!ul) {
-                            section.insert({
-                                top: '<ul class="messages"></ul>'
-                            });
-                            ul = section.select('.messages')[0]
-                        }
-                        var li = $(ul).select('.error-msg')[0];
-                        if (!li) {
-                            $(ul).insert({
-                                top: '<li class="error-msg"><ul></ul></li>'
-                            });
-                            li = $(ul).select('.error-msg')[0];
-                        }
-                        $(li).select('ul')[0].insert(
-                            '<li>' + response.error + '</li>'
-                        );
-                        self.updateCaptcha('user_login');
-                    }
-                    if (response.redirect) {
-                        document.location = response.redirect;
-                        return;
-                    }
-                    $('create-please-wait').hide();
-                    $('create').removeAttribute('disabled');
-                    $$('#ajaxlogin-create-form .buttons-set')[0]
-                        .removeClassName('disabled')
-                        .setOpacity(1);
-                }
-            });
-        });
-
-        $('ajaxlogin-forgot-password-form') && $('ajaxlogin-forgot-password-form').observe('submit', function(e) {
-            if (typeof event != 'undefined') { // ie9 fix
-                event.preventDefault ? event.preventDefault() : event.returnValue = false;
-            }
-            Event.stop(e);
-
-            if (!ajaxForgotForm.validator.validate()) {
-                return false;
-            }
-
-            $('forgot-please-wait').show();
-            $('btn-forgot').setAttribute('disabled', 'disabled');
-            $$('#ajaxlogin-forgot-password-form .buttons-set')[0]
-                .addClassName('disabled')
-                .setOpacity(0.5);
-
-            new Ajax.Request($('ajaxlogin-forgot-password-form').action, {
-                parameters: $('ajaxlogin-forgot-password-form').serialize(),
-                onSuccess: function(transport) {
-                    var section = $('ajaxlogin-forgot-password-form');
-                    if (!section) {
-                        return;
-                    }
-                    var ul = section.select('.messages')[0];
-                    if (ul) {
-                        ul.remove();
-                    }
-
-                    $('forgot-please-wait').hide();
-                    $('btn-forgot').removeAttribute('disabled');
-                    $$('#ajaxlogin-forgot-password-form .buttons-set')[0]
-                        .removeClassName('disabled')
-                        .setOpacity(1);
-
-                    var response = transport.responseText.evalJSON();
-
-                    if (response.error) {
-                        var section = $('ajaxlogin-forgot-password-form');
-                        if (!section) {
-                            return;
-                        }
-                        var ul = section.select('.messages')[0];
-                        if (!ul) {
-                            section.insert({
-                                top: '<ul class="messages"></ul>'
-                            });
-                            ul = section.select('.messages')[0]
-                        }
-                        var li = $(ul).select('.error-msg')[0];
-                        if (!li) {
-                            $(ul).insert({
-                                top: '<li class="error-msg"><ul></ul></li>'
-                            });
-                            li = $(ul).select('.error-msg')[0];
-                        }
-                        $(li).select('ul')[0].insert(
-                            '<li>' + response.error + '</li>'
-                        );
-                        self.updateCaptcha('user_forgotpassword');
-                    } else if (response.message) {
-                        var section = $('ajaxlogin-login-form');
-                        if (!section) {
-                            return;
-                        }
-                        var ul = section.select('.messages')[0];
-                        if (ul) {
-                            ul.remove();
-                        }
-                        var section = $('ajaxlogin-login-form');
-                        if (!section) {
-                            return;
-                        }
-                        var ul = section.select('.messages')[0];
-                        if (!ul) {
-                            section.insert({
-                                top: '<ul class="messages"></ul>'
-                            });
-                            ul = section.select('.messages')[0]
-                        }
-                        var li = $(ul).select('.success-msg')[0];
-                        if (!li) {
-                            $(ul).insert({
-                                top: '<li class="success-msg"><ul></ul></li>'
-                            });
-                            li = $(ul).select('.success-msg')[0];
-                        }
-                        $(li).select('ul')[0].insert(
-                            '<li>' + response.message + '</li>'
-                        );
-                        ajaxloginWindow.activate('login');
-                    }
-                }
-            });
-        });
-
-        $('ajaxlogin-logout-form') && $('ajaxlogin-logout-form').observe('submit', function(e) {
-            if (typeof event != 'undefined') { // ie9 fix
-                event.preventDefault ? event.preventDefault() : event.returnValue = false;
-            }
-            Event.stop(e);
-
-            if (!ajaxLogoutForm.validator.validate()) {
-                return false;
-            }
-
-            $('login-please-wait').show();
-            $('send2').setAttribute('disabled', 'disabled');
-            $$('#ajaxlogin-logout-form .buttons-set')[0]
-                .addClassName('disabled')
-                .setOpacity(0.5);
-
-            new Ajax.Request($('ajaxlogin-logout-form').action, {
-                parameters: $('ajaxlogin-logout-form').serialize(),
-                onSuccess: function(transport) {
-                    var section = $('ajaxlogin-logout-form');
-                    if (!section) {
-                        return;
-                    }
-                    var ul = section.select('.messages')[0];
-                    if (ul) {
-                        ul.remove();
-                    }
-
-                    var response = transport.responseText.evalJSON();
-                    if (response.error) {
-                        var section = $('ajaxlogin-logout-form');
-                        if (!section) {
-                            return;
-                        }
-                        var ul = section.select('.messages')[0];
-                        if (!ul) {
-                            section.insert({
-                                top: '<ul class="messages"></ul>'
-                            });
-                            ul = section.select('.messages')[0]
-                        }
-                        var li = $(ul).select('.error-msg')[0];
-                        if (!li) {
-                            $(ul).insert({
-                                top: '<li class="error-msg"><ul></ul></li>'
-                            });
-                            li = $(ul).select('.error-msg')[0];
-                        }
-                        $(li).select('ul')[0].insert(
-                            '<li>' + response.error + '</li>'
-                        );
-                    }
-                    if (response.redirect) {
-                        document.location = response.redirect;
-                        return;
-                    }
-                    $('login-please-wait').hide();
-                    $('send2').removeAttribute('disabled');
-                    $$('#ajaxlogin-logout-form .buttons-set')[0]
-                        .removeClassName('disabled')
-                        .setOpacity(1);
-                }
-            });
-        });
-    },
-
-    ajaxFailure: function(){
-        location.href = this.urls.failure;
-    },
-
-    _onKeyPress: function(e) {
-        if (e.keyCode == 27) {
-            this.hide();
-        }
-    },
-
-    updateCaptcha: function(id) {
-        var captchaEl = $(id);
-        if (captchaEl) {
-            captchaEl.captcha.refresh(captchaEl.previous('img.captcha-reload'));
-            // try to focus input element:
-            var inputEl = $('captcha_' + id);
-            if (inputEl) {
-                inputEl.focus();
-            }
-        }
+        var trigger = BC.Login.config.triggers[trigger];
+        BC.Login.update(trigger.window.show(), trigger.size).show();
     }
+
 };

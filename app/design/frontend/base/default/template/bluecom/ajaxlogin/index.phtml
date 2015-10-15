@@ -100,32 +100,30 @@
 
 
 <script type="text/javascript">
-    document.observe("dom:loaded", function() {
+    jQuery(document).ready(function(){
         var triggers = {
             login: {
-                el    : $$('.skip-account'),
+                el    : jQuery('.skip-account'),
                 event : 'click',
-                window: $('ajaxlogin-login-window'),
+                window: jQuery('#ajaxlogin-login-window'),
                 size: {
                     maxWidth: 300
                 }
             },
             create: {
-                el    : $$('#noaccount'),
+                el    : jQuery('#noaccount'),
                 event : 'click',
-                window: $('ajaxlogin-create-window')
+                window: jQuery('#ajaxlogin-create-window')
             },
             forgot: {
-                el    : $$('.ajaxlogin-forgot'),
+                el    : jQuery('.ajaxlogin-forgot'),
                 event : 'click',
-                window: $('ajaxlogin-forgot-window'),
+                window: jQuery('#ajaxlogin-forgot-window'),
                 size: {
                     maxWidth: 300
                 }
             }
         };
-        ajaxLoginWindow = new AjaxLogin({
-            triggers: triggers
-        });
+        BC.Login.init(triggers);
     });
 </script>

@@ -180,7 +180,7 @@ class Bc_Login_IndexController extends Mage_Core_Controller_Front_Action
      *
      * @param string|array $errors
      */
-    protected function _addSessionError($errors)
+   /* protected function _addSessionError($errors)
     {
         $session = Mage::getSingleton('customer/session');
         $session->setCustomerFormData($this->getRequest()->getPost());
@@ -191,7 +191,7 @@ class Bc_Login_IndexController extends Mage_Core_Controller_Front_Action
         } else {
             $session->addError($this->__('Invalid customer data'));
         }
-    }
+    }*/
 
     public function createAction()
     {
@@ -204,7 +204,7 @@ class Bc_Login_IndexController extends Mage_Core_Controller_Front_Action
             return;
         }
 
-        $session->setEscapeMessages(true); // prevent XSS injection in user input
+        $session->setEscapeMessages(true);
         if (!$this->getRequest()->isPost()) {
             return;
         }
@@ -229,7 +229,7 @@ class Bc_Login_IndexController extends Mage_Core_Controller_Front_Action
                 return;
             } else {
                 $result['error'] = $errors;
-                $this->_addSessionError($errors);
+                //$this->_addSessionError($errors);
             }
         } catch (Mage_Core_Exception $e) {
             $session->setCustomerFormData($this->getRequest()->getPost());
