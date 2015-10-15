@@ -108,26 +108,17 @@ BC.Login = {
         }
         jQuery('.select').addClass('ajaxlogin-hidden');
 
-        if (!jQuery('#ajaxlogin-mask') ){
-            var mask = jQuery("<div></div>").attr('id','ajaxlogin-mask');
+        if (!jQuery('body').find('#ajaxlogin-mask').length){
+            var mask = jQuery("<div id='ajaxlogin-mask'></div>").appendTo('body');
             var body    = jQuery('body'),
                 element = jQuery('html'),
                 height  = Math.max(
                     Math.max(body.outerHeight(), element.outerHeight()),
                     Math.max(body.height(), element.height())
                 );
-            jQuery(mask).css({
+            mask.css({
                 height: height + 'px'
             });
-            jQuery('body').append(mask);
-        }
-
-        if (!window.ajaxloginMaskCounter) {
-            window.ajaxloginMaskCounter = 0;
-        }
-        if (!this.maskCounted) {
-            this.maskCounted = 1;
-            window.ajaxloginMaskCounter++;
         }
 
         // set highest z-index
@@ -338,6 +329,9 @@ BC.Login = {
         return this;
     },
     hide: function() {
+        jQuery('#ajaxlogin-mask').remove();
+        jQuery('#select').removeClass('ajaxlogin-hidden');
+
         if (this.modal || !jQuery(BC.Login.window).is(":visible")) {
             return;
         }
@@ -349,11 +343,7 @@ BC.Login = {
         } else {
             jQuery(BC.Login.window).hide();
         }
-        this.maskCounted = 0;
-        if (!--window.ajaxloginMaskCounter) {
-            jQuery('#ajaxlogin-mask') && jQuery('#ajaxlogin-mask').remove();
-            jQuery('#select').removeClass('ajaxlogin-hidden');
-        }
+
     },
 
     setModal: function(flag) {
