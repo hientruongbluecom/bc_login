@@ -110,12 +110,7 @@ BC.Login = {
 
         if (!jQuery('body').find('#ajaxlogin-mask').length){
             var mask = jQuery("<div id='ajaxlogin-mask'></div>").appendTo('body');
-            var body    = jQuery('body'),
-                element = jQuery('html'),
-                height  = Math.max(
-                    Math.max(body.outerHeight(), element.outerHeight()),
-                    Math.max(body.height(), element.height())
-                );
+            var height  = jQuery(document).height();
             mask.css({
                 height: height + 'px'
             });
