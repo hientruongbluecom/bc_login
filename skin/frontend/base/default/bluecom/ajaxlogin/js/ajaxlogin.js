@@ -165,14 +165,15 @@ BC.Login = {
                         if (!t.window) {
                             return;
                         }
-                        BC.Login.update(t.window[0], t.size).show();
+                        if(jQuery(t.window[0]).length){
+                            BC.Login.update(t.window[0], t.size).show();
+                        }
                     });
                 });
             }
         }
     },
     _addEventListeners: function() {
-        var self = this;
 
         jQuery('#ajaxlogin-login-form') && jQuery('#ajaxlogin-login-form').bind('submit', function(e) {
             if (typeof e != 'undefined') { // ie9 fix
@@ -217,7 +218,7 @@ BC.Login = {
 
         jQuery('#ajaxlogin-create-form') && jQuery('#ajaxlogin-create-form').bind('submit', function(e) {
             if (typeof e != 'undefined') { // ie9 fix
-                e.preventDefault ? event.preventDefault() : e.returnValue = false;
+                e.preventDefault ? e.preventDefault() : e.returnValue = false;
             }
             e.stopPropagation();
 
@@ -242,7 +243,7 @@ BC.Login = {
                         jQuery('.messages').append('<li class="error-msg"><ul>'+response.error+'</ul></li>');
                     }
                     if (response.redirect) {
-                        jQuery(document).location.href = response.redirect;
+                        window.location.href = response.redirect;
                         return;
                     }
                     jQuery('#create-please-wait').hide();

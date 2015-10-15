@@ -129,8 +129,8 @@ class Bc_Login_IndexController extends Mage_Core_Controller_Front_Action
             $session->setCustomerAsLoggedIn($customer);
             $url = $this->_welcomeCustomer($customer);
         }
-        $this->_redirectSuccess($url);
-        return $this;
+        //$this->_redirectSuccess($url);
+        return $url;
     }
 
     /**
@@ -180,7 +180,7 @@ class Bc_Login_IndexController extends Mage_Core_Controller_Front_Action
      *
      * @param string|array $errors
      */
-   /* protected function _addSessionError($errors)
+    protected function _addSessionError($errors)
     {
         $session = Mage::getSingleton('customer/session');
         $session->setCustomerFormData($this->getRequest()->getPost());
@@ -191,7 +191,7 @@ class Bc_Login_IndexController extends Mage_Core_Controller_Front_Action
         } else {
             $session->addError($this->__('Invalid customer data'));
         }
-    }*/
+    }
 
     public function createAction()
     {
@@ -224,11 +224,10 @@ class Bc_Login_IndexController extends Mage_Core_Controller_Front_Action
                 Mage::dispatchEvent('customer_register_success',
                     array('account_controller' => $this, 'customer' => $customer)
                 );
-                $this->_successProcessRegistration($customer);
+                $result['redirect'] = $this->_successProcessRegistration($customer);
                 $result['success'] = true;
-                return;
             } else {
-                $result['error'] = $errors;
+                $result['error'] = Mage::helper('core')->jsonEncode($errors);
                 //$this->_addSessionError($errors);
             }
         } catch (Mage_Core_Exception $e) {
