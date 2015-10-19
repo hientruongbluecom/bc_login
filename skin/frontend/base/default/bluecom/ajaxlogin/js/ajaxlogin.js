@@ -246,7 +246,7 @@ BC.Login = {
                                 er += '<li>'+obj+'</li>';
                             });
                             jQuery('.messages').append('<li class="error-msg"><ul>'+er+'</ul></li>');
-                        } else {
+                        } else if(jQuery.isPlainObject(response.error)){
                             var arr = [],er='';
                             for (var elem in response.error) {
                                 arr.push(response.error[elem]);
@@ -254,7 +254,10 @@ BC.Login = {
                             jQuery.each(arr,function(i,obj){
                                 er += '<li>'+obj+'</li>';
                             });
+
                             jQuery('.messages').append('<li class="error-msg"><ul>'+er+'</ul></li>');
+                        }else{
+                            jQuery('.messages').append('<li class="error-msg"><ul><li>'+response.error+'</li></ul></li>');
                         }
 
                     }
