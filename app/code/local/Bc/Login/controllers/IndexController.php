@@ -227,7 +227,7 @@ class Bc_Login_IndexController extends Mage_Core_Controller_Front_Action
                 $result['redirect'] = $this->_successProcessRegistration($customer);
                 $result['success'] = true;
             } else {
-                $result['error'] = Mage::helper('core')->jsonEncode($errors);
+                $result['error'] = $errors;
                 //$this->_addSessionError($errors);
             }
         } catch (Mage_Core_Exception $e) {

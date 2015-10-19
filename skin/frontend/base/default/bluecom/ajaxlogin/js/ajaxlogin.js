@@ -199,7 +199,7 @@ BC.Login = {
                     var response = jQuery.parseJSON(transport);
                     if (response.error) {
                         jQuery('<ul class="messages"></ul>').insertBefore('form#ajaxlogin-login-form');
-                        jQuery('.messages').append('<li class="error-msg"><ul>'+response.error+'</ul></li>');
+                        jQuery('.messages').append('<li class="error-msg"><ul><li>'+response.error+'</li></ul></li>');
                     }
                     if (response.redirect) {
                         window.location.href = response.redirect;
@@ -240,7 +240,23 @@ BC.Login = {
                     var response = jQuery.parseJSON(transport);
                     if (response.error) {
                         jQuery('<ul class="messages"></ul>').insertBefore('form#ajaxlogin-create-form');
-                        jQuery('.messages').append('<li class="error-msg"><ul>'+response.error+'</ul></li>');
+                        if(jQuery.isArray(response.error)){
+                            var er ='';
+                            jQuery.each(response.error,function(i,obj){
+                                er += '<li>'+obj+'</li>';
+                            });
+                            jQuery('.messages').append('<li class="error-msg"><ul>'+er+'</ul></li>');
+                        } else {
+                            var arr = [],er='';
+                            for (var elem in response.error) {
+                                arr.push(response.error[elem]);
+                            }
+                            jQuery.each(arr,function(i,obj){
+                                er += '<li>'+obj+'</li>';
+                            });
+                            jQuery('.messages').append('<li class="error-msg"><ul>'+er+'</ul></li>');
+                        }
+
                     }
                     if (response.redirect) {
                         window.location.href = response.redirect;
@@ -280,10 +296,10 @@ BC.Login = {
                     var response = jQuery.parseJSON(transport);
                     if (response.error) {
                         jQuery('<ul class="messages"></ul>').insertBefore('form#ajaxlogin-forgot-password-form');
-                        jQuery('.messages').append('<li class="error-msg"><ul>'+response.error+'</ul></li>');
+                        jQuery('.messages').append('<li class="error-msg"><ul><li>'+response.error+'</li></ul></li>');
                     }else if(response.message){
                         jQuery('<ul class="messages"></ul>').insertBefore('form#ajaxlogin-forgot-password-form');
-                        jQuery('.messages').append('<li class="success-msg"><ul>'+response.message+'</ul></li>');
+                        jQuery('.messages').append('<li class="success-msg"><ul><li>'+response.message+'</li></ul></li>');
                         BC.Login.activate('login');
                     }
 
